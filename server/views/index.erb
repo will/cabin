@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Heroku Cabin: <%= @app %></title>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+  <style>
+    body { padding: 1em }
+    header { font-family: sans-serif; font-weight: bold }
+    #logs {
+      position: fixed; top: 3em; bottom: 3em; right: 2em; left: 2em;
+      border: 1px solid gray;
+      padding: 0.5em;
+
+      font-family: monospace;
+      white-space: pre;
+      overflow: scroll;
+    }
+  </style>
+  <script>
+    $(function() {
+     var logs = $("#logs");
+     var ws = new WebSocket('ws://localhost:3000/logs');
+     ws.onopen = function() { console.log('open')}
+     ws.onmessage=function(m) { stickyBottom(function(){logs.append(m.data)});}
+
+     function stickyBottom(callback) {
+       var atBottom = (logs[0].scrollHeight - logs.outerHeight() - logs.scrollTop() < 20);
+       callback();
+       if (atBottom) {
+         logs.scrollTop( logs[0].scrollHeight + logs.outerHeight() );
+       } else {
+         // show indication of new logs coming in
+         logs.scrollTop( logs.scrollTop() + 1 )
+         logs.scrollTop( logs.scrollTop() - 1 )
+       }
+     }
+    })
+  </script>
+</head>
+<body>
+  <header>Heroku Cabin: <%= @app %></header>
+  <div class='container'>
+    <div id='logs'></div>
+  </div>
+</body>
+</html>
