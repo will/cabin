@@ -1,6 +1,7 @@
 require 'sinatra'
 require 'sinatra-websocket'
 require 'heroku'
+require 'json'
 
 module Cabin
   class Server < Sinatra::Application
@@ -34,5 +35,8 @@ module Cabin
       end
     end
 
+    get '/ps' do
+      JSON.dump Heroku::Auth.api.get_ps(app).body
+    end
   end
 end
