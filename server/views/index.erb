@@ -8,7 +8,7 @@
     body { padding: 1em }
     header { font-family: sans-serif; font-weight: bold }
     #logs {
-      position: fixed; top: 3em; bottom: 3em; right: 2em; left: 10em;
+      position: fixed; top: 3em; bottom: 3em; right: 2em; left: 10.7em;
       border: 1px solid gray;
       padding: 0.5em;
 
@@ -16,13 +16,24 @@
       white-space: pre;
       overflow: scroll;
     }
+    .attn { color: red; font-weight: bold; }
   </style>
   <script>
     $(function() {
      var logs = $("#logs");
-     var ws = new WebSocket('ws://localhost:3000/logs');
-     ws.onopen = function() { console.log('open')}
-     ws.onmessage=function(m) { stickyBottom(function(){logs.append(m.data)});}
+
+     var es = new EventSource('/logs');
+     es.addEventListener('message', function(v) { addLogLine(v.data) } )
+
+     function addLogLine(line) {
+       stickyBottom(function(){
+         logs.append( formatLine(line + "\n") )
+       });
+     }
+
+     function formatLine(line) {
+       return (line.match(/attn/)) ? "<span class='attn'>"+line+"</span>" : line;
+     }
 
      function stickyBottom(callback) {
        var atBottom = (logs[0].scrollHeight - logs.outerHeight() - logs.scrollTop() < 20);
